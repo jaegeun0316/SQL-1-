@@ -96,6 +96,32 @@ WHERE (manager_id, job_id) IN (SELECT manager_id, job_id
                                 WHERE first_name = 'Bruce')
     AND first_name != 'Bruce';
 
+--부서별 최소급여를 받는 사원의 부서번호, 사원번호, 이름, 급여 정보 검색
+SELECT department_id 부서번호, employee_id 사원번호, first_name 이름, salary 급여
+FROM employees
+WHERE (department_id, salary) IN (SELECT department_id, MIN(salary)
+                                    FROM employees
+                                    GROUP BY department_id )
+                                    ORDER BY department_id;
+
+--예제
+SELECT first_name 이름, job_id 직종, salary 급여, department_id 부서번호
+FROM employees
+WHERE (job_id, salary) IN (SELECT job_id, MIN(salary)
+                                    FROM employees
+                                    GROUP BY job_id )
+                                    ORDER BY salary DESC;
+                                    
+
+
+
+
+
+
+
+
+
+
 
 
 
