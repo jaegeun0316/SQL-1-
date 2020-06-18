@@ -51,5 +51,58 @@ FROM employees
 WHERE job_id = (SELECT job_id FROM jobs WHERE job_title = 'Stock Manager');
                 
                 
-                
+--다중행 서브쿼리
+--연산자 (IN,ANY,ALL)
+SELECT salary FROM employees WHERE department_id = 90;
+
+--IN
+SELECT employee_id, first_name, last_name, salary
+FROM employees 
+WHERE salary IN (SELECT salary FROM employees WHERE department_id = 90) ;
+
+--ANY : 하나의 조건만 만족해도 됨
+SELECT employee_id, first_name, last_name, salary
+FROM employees
+WHERE  salary >= ANY(SELECT salary FROM employees WHERE department_id = 90);
+
+--ALL : 모든 조건을 만족해야 함
+SELECT employee_id, first_name, last_name, salary
+FROM employees
+WHERE  salary >= ALL(SELECT salary FROM employees WHERE department_id = 90);
+
+--예제1
+SELECT employee_id, first_name, job_id, salary, manager_id
+FROM employees
+WHERE department_id <> 20 AND manager_id IN (SELECT manager_id FROM employees WHERE department_id = 20);
+
+
+--예제2
+SELECT employee_id, last_name, job_id, salary
+FROM employees 
+WHERE salary < ANY(SELECT salary FROM employees WHERE job_id = 'ST_MAN')
+ORDER BY salary;
+
+--예제3
+SELECT employee_id, last_name, job_id, salary
+FROM employees
+WHERE salary < ALL (SELECT salary FROM employees WHERE job_id = 'IT_PROG');
+
+
+--다중열 서브쿼리
+SELECT employee_id, first_name, job_id, salary, manager_id
+FROM employees
+WHERE (manager_id, job_id) IN (SELECT manager_id, job_id
+                                FROM employees
+                                WHERE first_name = 'Bruce')
+    AND first_name != 'Bruce';
+
+
+
+
+
+
+
+
+
+
                 
