@@ -4,7 +4,7 @@
 --Abel의 급여 확인
 SELECT salary
 FROM employees
-WHERE  last_name = 'Abel';
+WHERE last_name = 'Abel';
 
 --서브쿼리를 사용
 --단일행 연산자(=, >, <, <=, >=, <>, !=)
