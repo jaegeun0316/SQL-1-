@@ -1,0 +1,92 @@
+--단순한 VIEW만들기 EMP_V1
+--하나의 원본테이블 사용, 함수나 그룹 사용안함, DML사용가는
+
+DROP VIEW EMP_V1; --미리 뷰 삭제명령
+
+--employees 테이블에서 필요한 열들을 골라서 뷰로 생성
+CREATE VIEW EMP_V1
+AS
+SELECT employee_id, last_name, email, hire_date, job_id
+FROM employees;
+
+--테이블 처럼 select문 사용
+select * from emp_v1;
+
+DESC EMP_V1;
+
+--테이블 처럼 DML사용 가능 (뷰는 가상의 테이블(저장공간이 없다) => 원본 테이블에 입력 됨)
+INSERT INTO EMP_V1 (employee_id, last_name, email, hire_date, job_id)
+VALUES (333, 'David','DAVID',SYSDATE,'IT_PROG');
+-- 뷰에 입력된 데이터 확인
+SELECT * FROM EMP_V1;
+SELECT * FROM employees;
+DESC employees;
+
+--삭제하기
+DELETE FROM EMP_V1
+WHERE employee_id = 333;
+commit;
+---두번째 뷰 만들기
+CREATE VIEW EMP_V2
+AS
+SELECT employee_id 직원번호, last_name 이름, email, hire_date, job_id
+FROM employees;
+
+SELECT * FROM EMP_V2;
+
+--세번째 뷰 만들기
+CREATE VIEW EMP_V3(직원번호, 이름, 이메일, 고용일자, 직종)
+AS
+SELECT employee_id, last_name, email, hire_date, job_id
+FROM employees;
+
+SELECT * FROM EMP_V1;
+SELECT * FROM EMP_V2;
+SELECT * FROM EMP_V3;
+SELECT * FROM employees;
+
+--DML 사용, 세번째 뷰에서~ *뷰에서 수정한 값이 원본에 그대로 수정
+INSERT INTO EMP_V3 (직원번호, 이름, 이메일, 고용일자, 직종)
+VALUES (334, 'LaLa', 'LaLa', SYSDATE, 'IT_PROG');
+
+--복잡한 뷰 만들기
+--그룹함수를 사용한 뷰는 DML 사용 불가
+-- OR REPLACE를 사용하여 수정이 쉽도록 만들기
+CREATE OR REPLACE VIEW 부서별_직원_보고서
+AS
+SELECT department_id 부서번호, COUNT(employee_id) 직원수,
+    MAX(salary) 최고급여, MIN(salary) 최저급여,
+    ROUND(AVG(salary)) 평균급여
+FROM employees
+GROUP BY department_id
+ORDER BY 부서번호;
+
+SELECT * FROM 부서별_직원_보고서;
+
+-- 읽기 전용 뷰 ( 옵션 WITH READ ONLY )
+CREATE OR REPLACE VIEW EMP_V_read
+AS
+SELECT employee_id, last_name, email, hire_date, job_id
+FROM employees
+WHERE department_id = 90
+WITH READ ONLY; --읽기전용
+
+SELECT * FROM EMP_V_read;
+
+--DML 사용 불가
+DELETE FROM EMP_V_READ; --모든 행 삭제
+
+--체크 옵션 뷰 ,WHERE절의 조건에서만 수정 및 입력가능
+CREATE OR REPLACE VIEW EMP_V_CHECK
+AS
+SELECT employee_id, last_name, email, hire_date, job_id, department_id
+FROM employees
+WHERE department_id = 90
+WITH CHECK OPTION; --90번 부서일 때만 DML가능
+
+SELECT * FROM EMP_V_CHECK;
+
+INSERT INTO EMP_V_CHECK 
+    (employee_id, last_name, email, hire_date, job_id, department_id)
+VALUES (444,'알리','ALI',SYSDATE,'IT_PROG', 90);
+
